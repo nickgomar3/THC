@@ -9,5 +9,6 @@ class Settings(BaseSettings):
     
     database_url: str
     port: int = 8000
+    pokeapi_url: str
 
 settings = Settings()

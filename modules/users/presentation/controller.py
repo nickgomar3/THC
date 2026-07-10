@@ -25,7 +25,7 @@ async def create_user(
     user: UserCreateDTO,
     service: UserService = Depends(get_user_service)
 ):
-    return await service.create_user(user.username, user.email, user.password)
+    return await service.create_user(user.username, user.email, user.password, user.pokemons)
 
 
 @router.put("/{user_id}", response_model=UserPrivate)
@@ -34,7 +34,7 @@ async def update_user(
     user: UserUpdateDTO,
     service: UserService = Depends(get_user_service)
 ):
-    return await service.update_user(user_id, user.username, user.email)
+    return await service.update_user(user_id, user.username, user.email, user.pokemons)
 
 
 @router.delete("/{user_id}", response_model=UserPublic)
