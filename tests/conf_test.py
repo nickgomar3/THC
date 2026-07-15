@@ -2,7 +2,7 @@ import os
 from collections.abc import AsyncGenerator
 
 os.environ["DATABASE_URL"] = (
-    "postgresql+psycopg://challengeuser:challpass@localhost/test_thchallenge"
+    "postgresql+psycopg://challengeuser:challpass@db/test_thchallenge"
 )
 
 import pytest
