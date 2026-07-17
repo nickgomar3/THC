@@ -1,16 +1,21 @@
 import os
 from collections.abc import AsyncGenerator
 
+
 os.environ["DATABASE_URL"] = (
     "postgresql+psycopg://challengeuser:challpass@db/test_thchallenge"
 )
 
 import pytest
+import respx
+import httpx
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
+from modules.users.dependencies import get_http_client
 from core.database import Base, get_db
+from core.config import settings
 from main import app
 
 import sys
@@ -42,6 +47,12 @@ def event_loop():
 @pytest.fixture(scope="session")
 def anyio_backend():
     return "asyncio"
+
+
+@pytest.fixture(autouse=True)
+def mock_pokeapi():
+    with respx.mock(base_url=settings.pokeapi_url, assert_all_mocked=False) as respx_mock:
+        yield respx_mock
 
 
 @pytest.fixture(scope="session")
@@ -97,9 +108,15 @@ async def client(
 
     async def override_get_db():
         yield db_session
+    
+    async def override_get_http_client():
+        # Usamos un cliente que vive solo durante el test
+        async with httpx.AsyncClient(base_url=settings.pokeapi_url) as ac:
+            yield ac
 
     app.dependency_overrides[get_db] = override_get_db
-
+    app.dependency_overrides[get_http_client] = override_get_http_client
+    
     async with AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",

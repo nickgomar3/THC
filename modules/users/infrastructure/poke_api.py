@@ -5,13 +5,24 @@ from core.config import settings
 
 
 class PokeAPIClient(IPokeAPIGateway):
+    def __init__(self, client: httpx.AsyncClient):
+        self.client = client
+        self.url = settings.pokeapi_url
+        
     
     async def get_pokemon_name(self, pokemon_id: int) -> str:
+        # Ya no abrimos el cliente aquí, usamos el que nos inyectaron
+        response = await self.client.get(f"{self.url.rstrip('/')}/{pokemon_id}")
+        response.raise_for_status()
+        return response.json()["name"]
+    
+    
+    """async def get_pokemon_name(self, pokemon_id: int) -> str:
         async with httpx.AsyncClient() as client:
-            #response = await client.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}")
+            
             
             url = f"{settings.pokeapi_url}/{pokemon_id}"
             
             response = await client.get(url)
             response.raise_for_status()
-            return response.json()["name"]
+            return response.json()["name"]"""

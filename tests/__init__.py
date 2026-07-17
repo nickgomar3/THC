@@ -1,4 +1,5 @@
 from conf_test import client, db_session, test_engine, setup_database, anyio_backend, event_loop
+from factories import UserFactory, UserPokemonFactory
 
 
 __all__ = [
@@ -7,5 +8,7 @@ __all__ = [
     "test_engine",
     "setup_database",
     "anyio_backend",
-    "event_loop"
+    "event_loop",
+    "UserFactory",
+    "UserPokemonFactory",
 ]
