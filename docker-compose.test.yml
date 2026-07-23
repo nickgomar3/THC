@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: 
+      context: .
+      target: tester
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+psycopg://challengeuser:challpass@db/test_thchallenge
+    depends_on:
+      - db
+    command: ["/app/.venv/bin/pytest", "tests"]
+  
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: challengeuser
+      POSTGRES_PASSWORD: challpass
+      POSTGRES_DB: test_thchallenge
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_test_data:

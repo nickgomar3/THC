@@ -19,6 +19,11 @@ RUN uv sync --locked --no-install-project --no-dev
 COPY . ./
 RUN uv sync --locked --no-dev
 
+# TEST STAGE
+FROM builder AS tester
+COPY tests/ ./tests/
+RUN uv sync --locked
+
 # PRODUCTION STAGE
 FROM python:3.14.4-slim-bookworm
 

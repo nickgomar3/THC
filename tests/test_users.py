@@ -2,7 +2,7 @@ import pytest
 import httpx
 from httpx import AsyncClient
 
-from factories import UserFactory, UserPokemonFactory
+from .factories import UserFactory, UserPokemonFactory
 
 
 @pytest.mark.anyio
