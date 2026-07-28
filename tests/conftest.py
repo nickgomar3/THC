@@ -1,10 +1,16 @@
 import os
 from collections.abc import AsyncGenerator
 
+from modules.users.infrastructure.poke_api import PokeAPIClient
+from modules.users.application.service import UserService
+from modules.users.infrastructure.sqlalchemy_unit_of_work import SQLAlchemyUnitOfWork
+from .factories import UserFactory, UserPokemonFactory
+
 
 os.environ["DATABASE_URL"] = (
     "postgresql+psycopg://challengeuser:challpass@db/test_thchallenge"
 )
+
 
 import pytest
 import respx
@@ -13,7 +19,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from modules.users.dependencies import get_http_client
+from modules.users.dependencies import get_http_client, get_user_service
 from core.database import Base, get_db
 from core.config import settings
 from main import app
@@ -106,16 +112,25 @@ async def client(
     db_session: AsyncSession
 ) -> AsyncGenerator[AsyncClient]:
 
+    # 1. Creamos el override del servicio usando la sesión del test actual
+    async def override_get_user_service():
+        uow = SQLAlchemyUnitOfWork(db_session)
+        # Le pasamos un AsyncClient de httpx para que cumpla con el __init__
+        async_client = httpx.AsyncClient(base_url=settings.pokeapi_url)
+        gateway = PokeAPIClient(client=async_client)
+        return UserService(uow=uow, poke_gateway=gateway)
+
     async def override_get_db():
         yield db_session
     
     async def override_get_http_client():
-        # Usamos un cliente que vive solo durante el test
         async with httpx.AsyncClient(base_url=settings.pokeapi_url) as ac:
             yield ac
 
+    # 2. Aplicamos los overrides en FastAPI
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_http_client] = override_get_http_client
+    app.dependency_overrides[get_user_service] = override_get_user_service
     
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -123,4 +138,12 @@ async def client(
     ) as ac:
         yield ac
 
+    # 3. Limpiamos los overrides al terminar
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def set_factory_session(db_session):
+    """Inyecta automáticamente la sesión de test en las factorías de SQLAlchemy."""
+    UserFactory._meta.sqlalchemy_session = db_session
+    UserPokemonFactory._meta.sqlalchemy_session = db_session
