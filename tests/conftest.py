@@ -115,7 +115,6 @@ async def client(
     # 1. Creamos el override del servicio usando la sesión del test actual
     async def override_get_user_service():
         uow = SQLAlchemyUnitOfWork(db_session)
-        # Le pasamos un AsyncClient de httpx para que cumpla con el __init__
         async_client = httpx.AsyncClient(base_url=settings.pokeapi_url)
         gateway = PokeAPIClient(client=async_client)
         return UserService(uow=uow, poke_gateway=gateway)

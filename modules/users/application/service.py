@@ -1,5 +1,7 @@
 from unicodedata import name
 
+from fastapi import HTTPException
+
 from gateway import IPokeAPIGateway
 from modules.users.domain import User, UserPokemon, IUnitOfWork
 
@@ -32,7 +34,8 @@ class UserService:
             user = await self.uow.users.get_by_id(user_id)
             
             if not user:
-                raise Exception("User not found")
+                # raise Exception("User not found")
+                raise HTTPException(status_code=404, detail="User not found")
             
             pokemons_with_names = []
             for p in user.pokemons:
@@ -69,7 +72,8 @@ class UserService:
             user = await self.uow.users.get_by_id(user_id)
             
             if not user:
-                raise Exception("User not found")
+                # raise Exception("User not found")
+                raise HTTPException(status_code=404, detail="User not found")
             
             user.username = username
             user.email = email
@@ -91,7 +95,8 @@ class UserService:
             user = await self.uow.users.get_by_id(user_id)
             
             if not user:
-                raise Exception("User not found")
+                #raise Exception("User not found")
+                raise HTTPException(status_code=404, detail="User not found")
             
             await self.uow.users.delete(user)
             await self.uow.commit()

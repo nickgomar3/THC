@@ -1,5 +1,4 @@
 from fastapi import Depends
-# from sqlalchemy.orm import Session
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
