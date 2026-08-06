@@ -1,0 +1,53 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.13
+        environment:
+          # Coincide exactamente con tu conftest.py (@db)
+          DATABASE_URL: postgresql+psycopg://challengeuser:challpass@db/test_thchallenge
+      
+      # Definimos el servicio con el nombre 'db' para que la resolución de host sea idéntica a Docker Compose
+      - image: cimg/postgres:15-alpine
+        name: db
+        environment:
+          POSTGRES_USER: challengeuser
+          POSTGRES_PASSWORD: challpass
+          POSTGRES_DB: test_thchallenge
+
+    steps:
+      - checkout
+
+      # Instalar uv de forma global y rápida
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+
+      # Sincronizar dependencias con uv (lee tu pyproject.toml y el grupo dev)
+      - run:
+          name: Install dependencies with uv
+          command: |
+            ~/.cargo/bin/uv sync --group dev
+
+      # Esperar a que PostgreSQL esté listo en el host 'db'
+      - run:
+          name: Wait for PostgreSQL
+          command: |
+            dockerize -wait tcp://db:5432 -timeout 1m
+
+      # Ejecutar pytest utilizando el entorno virtual gestionado por uv
+      - run:
+          name: Run tests with pytest
+          command: |
+            ~/.cargo/bin/uv run pytest
+
+workflows:
+  test-workflow:
+    jobs:
+      - build-and-test
