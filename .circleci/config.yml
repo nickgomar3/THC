@@ -12,7 +12,7 @@ jobs:
           DATABASE_URL: postgresql+psycopg://challengeuser:challpass@db/test_thchallenge
       
       # Definimos el servicio con el nombre 'db' para que la resolución de host sea idéntica a Docker Compose
-      - image: cimg/postgres:15-alpine
+      - image: postgres:15-alpine
         name: db
         environment:
           POSTGRES_USER: challengeuser
