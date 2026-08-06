@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Run tests with pytest
           command: |
-            ~/.cargo/bin/uv run pytest
+            uv run pytest
 
 workflows:
   test-workflow:
