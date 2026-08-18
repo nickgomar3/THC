@@ -40,26 +40,19 @@ jobs:
           command: |
             dockerize -wait tcp://db:5432 -timeout 1m
 
-      # 1. Ejecutar pytest midiendo la cobertura (genera el archivo .coverage por defecto)
+      # 1. Ejecutar pytest midiendo la cobertura
       - run:
           name: Run tests with pytest
           command: |
             uv run pytest --cov=modules --cov=core
       
-      # 2. Enviar el reporte a Coveralls con las variables de entorno explícitas
+      # 2. Enviar el reporte a Coveralls usando el paquete oficial
       - run:
           name: Upload coverage to Coveralls
           command: |
-            uv run pip install coveralls
             uv run coveralls --service=circle-ci
           environment:
             COVERALLS_REPO_TOKEN: $COVERALLS_REPO_TOKEN
-            CI_NAME: circle-ci
-            CI_BUILD_NUMBER: $CIRCLE_BUILD_NUM
-            CI_BRANCH: $CIRCLE_BRANCH
-            CI_BUILD_URL: $CIRCLE_BUILD_URL
-            CI_COMMIT_SHA: $CIRCLE_SHA1
-            CI_PULL_REQUEST: $CIRCLE_PULL_REQUEST
 
 workflows:
   test-workflow:
