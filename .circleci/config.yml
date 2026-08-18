@@ -8,11 +8,8 @@ jobs:
     docker:
       - image: cimg/python:3.13
         environment:
-          # Coincide exactamente con tu conftest.py (@db)
           DATABASE_URL: postgresql+psycopg://challengeuser:challpass@db/test_thchallenge
-          
-      
-      # Definimos el servicio con el nombre 'db' para que la resolución de host sea idéntica a Docker Compose
+                
       - image: postgres:15-alpine
         name: db
         environment:
@@ -42,11 +39,18 @@ jobs:
           command: |
             dockerize -wait tcp://db:5432 -timeout 1m
 
-      # Ejecutar pytest utilizando el entorno virtual gestionado por uv
+      # 1. Ejecutar pytest midiendo la cobertura y generando el archivo lcov/json
       - run:
           name: Run tests with pytest
           command: |
-            uv run pytest
+            uv run pytest --cov=modules --cov=core --cov-report=lcov
+      
+      # 2. Enviar el reporte de cobertura a Coveralls
+      - run:
+          name: Upload coverage to Coveralls
+          command: |
+            uv run pip install coveralls
+            uv run coveralls --service=circle-ci
 
 workflows:
   test-workflow:
