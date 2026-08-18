@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     port: int = 8000
     pokeapi_url: str
     
-    postgres_user: str
-    postgres_password: str
-    postgres_db: str
+    postgres_user: str = "challengeuser"
+    postgres_password: str = "challpass"
+    postgres_db: str = "thchallenge"
 
 settings = Settings()
