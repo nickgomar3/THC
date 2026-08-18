@@ -10,5 +10,11 @@ class Settings(BaseSettings):
     database_url: str
     port: int = 8000
     pokeapi_url: str
+    
+    postgres_user: str
+    postgres_password: str
+    postgres_db: str
+    test_database_url: str | None = None
+    test_postgres_db: str | None = None
 
 settings = Settings()
