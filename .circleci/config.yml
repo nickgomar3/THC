@@ -39,13 +39,13 @@ jobs:
           command: |
             dockerize -wait tcp://db:5432 -timeout 1m
 
-      # 1. Ejecutar pytest midiendo la cobertura y generando el archivo lcov/json
+      # 1. Ejecutar pytest midiendo la cobertura y generando el archivo JSON compatible
       - run:
-          name: Run tests with pytest
+          name: Run tests with pytest and coverage
           command: |
-            uv run pytest --cov=modules --cov=core --cov-report=lcov
-      
-      # 2. Enviar el reporte de cobertura a Coveralls
+            uv run pytest --cov=modules --cov=core --cov-report=json
+
+      # 2. Enviar el reporte a Coveralls usando el json generado
       - run:
           name: Upload coverage to Coveralls
           command: |
