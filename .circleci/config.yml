@@ -9,14 +9,14 @@ jobs:
       - image: cimg/python:3.13
         environment:
           # Coincide exactamente con tu conftest.py (@db)
-          DATABASE_URL: postgresql+psycopg://myuser:mypassword@db:5432/test_db
+          DATABASE_URL: postgresql+psycopg://user:password@db:5432/test_db
       
       # Definimos el servicio con el nombre 'db' para que la resolución de host sea idéntica a Docker Compose
       - image: postgres:15-alpine
         name: db
         environment:
-          POSTGRES_USER: myuser
-          POSTGRES_PASSWORD: mypassword
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
 
     steps:
