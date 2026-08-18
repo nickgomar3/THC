@@ -15,9 +15,9 @@ jobs:
       - image: postgres:15-alpine
         name: db
         environment:
-          POSTGRES_USER: $POSTGRES_USER
-          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-          POSTGRES_DB: $TEST_POSTGRES_DB
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: test_db
 
     steps:
       - checkout
